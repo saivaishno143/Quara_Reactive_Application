@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: demo-app
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: Quara_db
+      auto-index-creation: true
+
