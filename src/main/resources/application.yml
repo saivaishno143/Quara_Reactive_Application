@@ -1,6 +1,7 @@
 spring:
   application:
     name: demo-app
+
   data:
     mongodb:
       host: localhost
@@ -8,3 +9,5 @@ spring:
       database: Quara_db
       auto-index-creation: true
 
+server:
+  port: 6636

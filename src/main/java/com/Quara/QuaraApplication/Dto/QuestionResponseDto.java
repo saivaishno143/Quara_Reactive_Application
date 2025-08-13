@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -21,5 +22,5 @@ public class QuestionResponseDto {
 
     private String content;
 
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }
