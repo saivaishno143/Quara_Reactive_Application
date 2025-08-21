@@ -3,7 +3,9 @@ package com.Quara.QuaraApplication.Service;
 import com.Quara.QuaraApplication.Adapter.QuestionAdapter;
 import com.Quara.QuaraApplication.Dto.QuestionRequestDto;
 import com.Quara.QuaraApplication.Dto.QuestionResponseDto;
+import com.Quara.QuaraApplication.Events.ViewCountEvent;
 import com.Quara.QuaraApplication.Models.Question;
+import com.Quara.QuaraApplication.Producers.KafkaEventProducer;
 import com.Quara.QuaraApplication.Repository.QuestionRepository;
 import com.Quara.QuaraApplication.Utils.CursorUtils;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class QuestionService implements IQuestionService{
     private final QuestionRepository questionRepository;
+
+    private final KafkaEventProducer kafkaEventProducer;
 
     @Override
     public Mono<QuestionResponseDto> createQuestion(QuestionRequestDto questionRequestDto) {
@@ -44,7 +48,10 @@ public class QuestionService implements IQuestionService{
     public Mono<QuestionResponseDto> getQuestionById(String id) {
     return questionRepository.findById(id)
                 .map(QuestionAdapter::QuestionModelToResponseDto)
-                .doOnSuccess(response -> System.out.println("Question retrieved successfully: " + response))
+                .doOnSuccess(response-> {System.out.println("Question retrieved successfully: " + response);
+                    ViewCountEvent viewCountEvent=new ViewCountEvent(id,"question",LocalDateTime.now());
+                    kafkaEventProducer.publishViewCountEvent(viewCountEvent);
+                })
                 .doOnError(error -> System.out.println("Error retrieving question: " + error.getMessage()));
 
     }
