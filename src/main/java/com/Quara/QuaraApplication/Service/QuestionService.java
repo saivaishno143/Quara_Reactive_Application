@@ -5,7 +5,9 @@ import com.Quara.QuaraApplication.Dto.QuestionRequestDto;
 import com.Quara.QuaraApplication.Dto.QuestionResponseDto;
 import com.Quara.QuaraApplication.Events.ViewCountEvent;
 import com.Quara.QuaraApplication.Models.Question;
+import com.Quara.QuaraApplication.Models.QuestionElasticDocument;
 import com.Quara.QuaraApplication.Producers.KafkaEventProducer;
+import com.Quara.QuaraApplication.Repository.QuestionDocumentReposiroy;
 import com.Quara.QuaraApplication.Repository.QuestionRepository;
 import com.Quara.QuaraApplication.Utils.CursorUtils;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,10 @@ public class QuestionService implements IQuestionService{
     private final QuestionRepository questionRepository;
 
     private final KafkaEventProducer kafkaEventProducer;
+
+    private final IQuestionIndexService questionIndexService;
+
+    private final QuestionDocumentReposiroy questionDocumentReposiroy;
 
     @Override
     public Mono<QuestionResponseDto> createQuestion(QuestionRequestDto questionRequestDto) {
@@ -37,7 +44,10 @@ public class QuestionService implements IQuestionService{
                 .build();
 
         return questionRepository.save(question)
-                .map(QuestionAdapter::QuestionModelToResponseDto)
+                .map(savedQuestion ->{
+                    questionIndexService.createQuestionIndex(savedQuestion);
+                    return QuestionAdapter.QuestionModelToResponseDto(savedQuestion);
+                })
                 .doOnSuccess(response-> System.out.println("Question created successfully: " + response))
                 .doOnError(error->System.out.println("Error creating question: " + error.getMessage()));
 
@@ -90,6 +100,11 @@ public class QuestionService implements IQuestionService{
                     .doOnComplete(() -> System.out.println("All questions retrieved successfully"));
 
         }
+    }
+
+    @Override
+    public List<QuestionElasticDocument> SearchQuestionByElastic(String query) {
+        return questionDocumentReposiroy.findByTitleContainingOrContentContaining(query,query);
     }
 
 

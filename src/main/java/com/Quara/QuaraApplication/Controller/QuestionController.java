@@ -2,11 +2,14 @@ package com.Quara.QuaraApplication.Controller;
 
 import com.Quara.QuaraApplication.Dto.QuestionRequestDto;
 import com.Quara.QuaraApplication.Dto.QuestionResponseDto;
+import com.Quara.QuaraApplication.Models.QuestionElasticDocument;
 import com.Quara.QuaraApplication.Service.IQuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -49,5 +52,9 @@ public class QuestionController {
         return questionService.getAllQuestions(cursor, size)
                 .doOnError(error -> System.out.println("Error retrieving questions: " + error.getMessage()))
                 .doOnComplete(() -> System.out.println("All questions retrieved successfully"));
+    }
+    @GetMapping("/elasticsearch")
+    List<QuestionElasticDocument> SearchQuestionByElastic(@RequestParam String query){
+        return questionService.SearchQuestionByElastic(query);
     }
 }

@@ -1,6 +1,10 @@
 spring:
   application:
     name: demo-app
+  elasticsearch:
+    uris: https://localhost:9200
+    username: elastic
+    password: gu3w106jMJ6riv1*BCnz
 
   data:
     mongodb:

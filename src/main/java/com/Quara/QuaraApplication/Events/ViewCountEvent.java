@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 
 public class ViewCountEvent {
-    private String targetId;
-    private String targetType;
+    private String targetId;//it refers to the id of the target object being viewed
+    private String targetType;//it refers to which type eg answer, question, etc.
     private LocalDateTime localDateTime;
 }
